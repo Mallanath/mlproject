@@ -10,11 +10,6 @@ from sklearn.model_selection import GridSearchCV
 
 from src.exception import CustomException
 
-##we did train test split in dataingestion, we can write a function to do the same
-## if we want to make code much more cleaner we do this
-
-##save_object function will save the object in the file path it is used in data_transformation file
-
 def save_object(file_path, obj):
     try:
         dir_path = os.path.dirname(file_path)
@@ -27,13 +22,18 @@ def save_object(file_path, obj):
     except Exception as e:
         raise CustomException(e, sys)
     
-def evaluate_models(X_train, y_train,X_test,y_test,models):
+def evaluate_models(X_train, y_train,X_test,y_test,models,param):
     try:
         report = {}
 
         for i in range(len(list(models))):
             model = list(models.values())[i]
-            
+            para=param[list(models.keys())[i]]
+
+            gs = GridSearchCV(model,para,cv=3)
+            gs.fit(X_train,y_train)
+
+            model.set_params(**gs.best_params_)
             model.fit(X_train,y_train)
 
             #model.fit(X_train, y_train)  # Train model
